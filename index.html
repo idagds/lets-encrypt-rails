@@ -245,16 +245,21 @@
                ## Namespace [[1]](http://www.haifux.org/lectures/299/netLec7.pdf) [[2]](https://media.wix.com/ugd/295986_d5059f95a78e451db5de3d54f711e45d.pdf) [[3]](https://lwn.net/Articles/531114/)
 
                - Lightweight process virtualisation
-               - Six Namespaces:
+               - Seven Namespaces:
                 - uts (hostname)
                 - ipc (Interprocess communication)
                 - pid (processes)
                 - mnt (mount points, filesystems)
                 - net (network stack)
                 - user (UIDs)
-               - `clone` — create a new process and namespace and attach process to new namespace
-               - `unshare` — create a new namespace and attach current process
-               - `setns` — join Namespace
+                - cgroup
+               - [man](http://man7.org/linux/man-pages/man7/namespaces.7.html)
+
+               <aside class="notes">
+                 <p>`clone` — create a new process and namespace and attach process to new namespace</p>
+                 <p>`unshare` — create a new namespace and attach current process</p>
+                 <p>`setns` — join Namespace</p>
+               </aside>
               </script>
           </section>
 
@@ -358,6 +363,27 @@
               <aside class="notes">
                 <p>By default mapped to overflow user — with no rights or capabilities</p>
               </aisde>
+             </script>
+           </section>
+
+           <section data-markdown>
+             <script type="text/template">
+               ### cgroup [[1]](http://man7.org/linux/man-pages/man7/cgroup_namespaces.7.html)
+
+               - Separate set of cgroup root directories (`ls /proc/$$/cgroup`)
+               - Child namespace takes parent namespace's cgroups as root cgroups
+               - Prevents namespaced processes from escaping the limits/controls of ancestor cgroups
+
+               <aside class="notes">
+                Each cgroup namespace has its own set of cgroup root directories,
+                which are the base points for the relative locations displayed in
+                /proc/[pid]/cgroup.  When a process creates a new cgroup namespace
+                using clone(2) or unshare(2) with the CLONE_NEWCGROUP flag, it enters
+                a new cgroup namespace in which its current cgroups directories
+                become the cgroup root directories of the new namespace.  (This
+                applies both for the cgroups version 1 hierarchies and the cgroups
+                version 2 unified hierarchy.)
+               </aside>
              </script>
            </section>
         </section>
