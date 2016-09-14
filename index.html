@@ -231,7 +231,7 @@
                both userland and kernel space. LXC takes care of networking and storage too.
              </p>
              <p>
-               Pretty terrible documentation. Developed mainly on Ubuntu -- so most things will be documented
+               Pretty terrible documentation. Developed mainly on Ubuntu — so most things will be documented
                for Ubuntu, that may or may not work on other distributions.
              </p>
            </aside>
@@ -251,9 +251,9 @@
                 - mnt (mount points, filesystems)
                 - net (network stack)
                 - user (UIDs)
-               - `clone` -- create a new process and namespace and attach process to new namespace
-               - `unshare` -- create a new namespace and attach current process
-               - `setns` -- join Namespace
+               - `clone` — create a new process and namespace and attach process to new namespace
+               - `unshare` — create a new namespace and attach current process
+               - `setns` — join Namespace
               </script>
           </section>
 
@@ -335,13 +335,13 @@
              <script type="text/template">
                ### net (Network Stack) [[1]](https://blog.yadutaf.fr/2014/01/19/introduction-to-linux-namespaces-part-5-net/) [[2]](http://windsock.io/net-namespace/)
 
-               - Private network stack -- routews, firewall rules, network devices, ports
+               - Private network stack — routews, firewall rules, network devices, ports
                - Communicate with the outside world via `veth`, for example
 
                <aside class="notes">
                  <p>A network device and socket belongs to exactly one network namespace</p>
                  <p>A new namespace only has the loopback device</p>
-                 <p> Creating a pair of network devices (veth) and move one to another network namespace. -- Veth (Virtual Ethernet) is like a pipe. </p>
+                 <p> Creating a pair of network devices (veth) and move one to another network namespace. — Veth (Virtual Ethernet) is like a pipe. </p>
 
                </aside>
              </script>
@@ -355,7 +355,7 @@
               - Needs to map inner UID/GID with parent UID/GID
 
               <aside class="notes">
-                <p>By default mapped to overflow user -- with no rights or capabilities</p>
+                <p>By default mapped to overflow user — with no rights or capabilities</p>
               </aisde>
              </script>
            </section>
@@ -628,23 +628,53 @@
               FROM ruby:2.3.1
 
               WORKDIR /app/src
+              EXPOSE 3000
 
               COPY Gemfile Gemfile.lock /app/src/
-              RUN bundle install
+              RUN bundle install --frozen --no-cache
 
-              COPY . /usr/src/app
-              CMD rails s
+              COPY . /app/src
+              CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
               ```
             </script>
           </section>
 
           <section data-markdown>
             <script type="text/template">
-              ### Running Docker Containers
+              ### Preparing Docker Containers
+
+              ```bash
+              # Create network for containers
+              docker network create ror_example
+
+              # Build Rails image
+              docker build -t example_rails .
+              ```
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ### Starting Docker Containers
 
               ```bash
               # Postgres Container
-              docker run
+              docker run --name example_postgres -d \
+                --network ror_example --network-alias postgres \
+                --restart always \
+                -e "POSTGRES_DB=example_development"  \
+                -e "POSTGRES_USER=example" \
+                -e "POSTGRES_PASSWORD=example" \
+                -v example_pg:/var/lib/postgresql/data \
+                postgres:9.5
+
+
+              # Rails Container
+              docker run --name example_rails -d \
+                --network ror_example \
+                --restart always \
+                --publish "3000:3000" \
+                example_rails
               ```
             </script>
           </section>
@@ -654,6 +684,37 @@
               ### docker-compose
 
               - Orchestrates multiple containers and their parameters in a single `.yml` file
+              - Allows declaration of container dependencies
+              - [Soon](https://github.com/docker/compose/issues/3754) — Container [healthcheck](https://docs.docker.com/engine/reference/builder/#/healthcheck)
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ### `docker-compose.yml`
+
+              ```yml
+              version: "2.0"
+              services:
+                postgres:
+                  image: postgres:9.5
+                  environment:
+                    POSTGRES_DB: example_development
+                    POSTGRES_USER: example
+                    POSTGRES_PASSWORD: example
+                  volumes:
+                    - pg_data:/var/lib/postgresql/data
+                  restart: always
+                rails:
+                  build: .
+                  depends_on:
+                    - postgres
+                  ports:
+                    - "3000:3000"
+                  restart: always
+              volumes:
+                pg_data: {}
+              ```
             </script>
           </section>
         </section>
