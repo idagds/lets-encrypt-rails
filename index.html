@@ -26,7 +26,8 @@
 			<div class="slides">
 				<section>
           <h1>Let's Encrypt Rails</h1>
-          <p>me@yongwen.xyz</p>
+          <p>me [at] yongwen.xyz</p>
+          <p>docker.yongwen.xyz</p>
         </section>
 
         <section>
@@ -364,12 +365,168 @@
         <section>
           <section data-markdown>
             <script type="text/template">
-              ## Control Groups (cgroups) [[1]](https://lwn.net/Articles/604609/)
+              ## Control Groups (cgroups) (V1) [[1]](https://lwn.net/Articles/604609/) [[2]](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Resource_Management_Guide/chap-Introduction_to_Control_Groups.htmll)
+
+              - (Multiple) hierarchical organisation of processes
+              - Associated with Linux Subsystems
+
+              <aside class="notes">
+                Historically, there has been a desire for both a organisational and classification need to
+                group processes. cgroups tries to fulfil these two roles in a generic fashion.
+              </aside>
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ## Process vs cgroups
+
+              - All processes are children of PID 1 (i.e. `init`)
+              - Processes can be in multiple cgroups (or called hierarchies)
+              - Both are hierarchical
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/javascript">
+              ### cgroup VFS
+
+              - Works via a Virtual File System
+              - All actions via filesystem actions
+              - `/sys/fs/cgroup` for systemd
+
+              <aside class="notes">
+                All entries created in it are not persistent and deleted after reboot.
+              </aside>
+            </script>
+          </section>
+
+          <section>
+            <h3>Root hierarchies</h3>
+            <pre>
+$ ls -l /sys/fs/cgroup | awk '{print $9, $10, $11}'
+blkio
+cgmanager
+cpu -> cpu,cpuacct
+cpuacct -> cpu,cpuacct
+cpu,cpuacct
+cpuset
+devices
+freezer
+hugetlb
+memory
+net_cls -> net_cls,net_prio
+net_cls,net_prio
+net_prio -> net_cls,net_prio
+perf_event
+pids
+systemd
+            </pre>
+          </section>
+
+          <section>
+            <h3><code>systemd</code> cgroup</h3>
+            <pre>
+ls -l /sys/fs/cgroup/systemd | awk '{print $9, $10, $11}'
+cgroup.clone_children
+cgroup.procs
+cgroup.sane_behavior
+<strong style="color: red">docker</strong>
+<strong style="color: red">init.scope</strong>
+notify_on_release
+release_agent
+<strong style="color: red">system.slice</strong>
+tasks
+<strong style="color: red">user</strong>
+<strong style="color: red">user.slice</strong>
+            </pre>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ### cgroup files
+
+              - Directories: Child cgroups
+              - `tasks`: list of tasks (PID) [[1]](http://stackoverflow.com/a/9306150/602002)
+              - `cgroup.procs`- list of thread group IDs [[1]](http://stackoverflow.com/a/9306150/602002)
+              - `notify_on_release`: Flag to run `release_agent` path on exit
+              - Other files: specific to the cgroup, usually written by the subsystems using the cgroup
+            </script>
+          </section>
+
+          <section>
+            <h3>Subsystems</h3>
+            <pre>
+  $ column -t /proc/cgroups
+  #subsys_name  hierarchy  num_cgroups  enabled
+  cpuset        7          5            1
+  cpu           2          112          1
+  cpuacct       2          112          1
+  blkio         11         112          1
+  memory        9          168          1
+  devices       8          112          1
+  freezer       4          8            1
+  net_cls       5          5            1
+  perf_event    6          5            1
+  net_prio      5          5            1
+  hugetlb       3          5            1
+  pids          10         113          1
+            </pre>
+
+            <aside class="notes">
+              From <a href="http://man7.org/linux/man-pages/man7/cgroups.7.html">man</a>
+              The fields in this file are, from left to right:
+              <ol>
+                <li>The name of the controller.</li>
+                <li>The unique ID of the cgroup hierarchy on which this controller is mounted. </li>
+                <li>The number of control groups in this hierarchy using this controller.</li>
+                <li>This field contains the value 1 if this controller is enabled, or 0 if it has been disabled </li>
+              </ol>
+            </aside>
+          </section>
+          <section>
+            <h3>cgroups and subsystems for a process</h3>
+            <pre>
+$ cat "/proc/$$/cgroup"
+11:blkio:/user.slice
+10:pids:/user.slice/user-1000.slice
+9:memory:/user.slice
+8:devices:/user.slice
+7:cpuset:/
+6:perf_event:/
+5:net_cls,net_prio:/
+4:freezer:/
+3:hugetlb:/
+2:cpu,cpuacct:/user.slice
+1:name=systemd:/user.slice/user-1000.slice/session-c2.scope
+            </pre>
+
+            <aside class="notes">
+              From <a href="http://man7.org/linux/man-pages/man7/cgroups.7.html">man</a>:
+              For each cgroup hierarchy of which the process is a member,
+            there is one entry containing three colon-separated fields of
+            the form:
+
+                 hierarchy-ID:subsystem-list:cgroup-path
+            </aside>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
 
             </script>
           </section>
-        </section>
 
+          <section data-markdown>
+            <script type="text/template">
+              ### cgroup V2
+
+              - A single unified hierarchy
+              - Tasks (processes) only in leaf nodes
+              - [Read more](https://www.kernel.org/doc/Documentation/cgroup-v2.txt)
+            </script>
+          </section>
+        </section>
         <section>
           <section data-markdown>
             <script type="text/template">
@@ -399,7 +556,6 @@
             <h3>LXC vs Docker</h3>
             <img src="images/lxc-vs-docker.png" />
           </section>
-
 
           <section data-markdown>
             <script type="text/template">
@@ -728,7 +884,7 @@
             <script type="text/template">
               ### nginx Reverse Proxy with Let's Encrypt TLS Certificate [[1]](https://github.com/lawliet89/docker-nginx-tutorial)
 
-              Diagram here
+              ![Diagram](images/ror-docker.png)
             </script>
           </section>
 
