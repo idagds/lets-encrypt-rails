@@ -513,7 +513,62 @@ $ cat "/proc/$$/cgroup"
 
           <section data-markdown>
             <script type="text/template">
+                ### Subsystems
 
+                - `4.4.0-36`: cpuset, cpu, cpuacct, blkio, memory, devices,
+                freezer, net_cls, perf_event, net_prio, hugetlb, pids [[1]](http://man7.org/linux/man-pages/man7/cgroups.7.html)
+                - Some subsystems simply identify processes or collect information (e.g. cpuacct)
+                - Some subsystems impose control (e.g. cpuset, cpu, memory)
+                - Subsystems can choose to push data down the hierarchy (e.g. freezer)
+                - or upwards (e.g. perf_event)
+
+
+                <aside class="notes">
+                  <a href="http://man7.org/linux/man-pages/man7/cgroups.7.html">man</a>
+                  <h5>cpu </h5>
+                  Cgroups can be guaranteed a minimum number of "CPU shares"
+                  when a system is busy.  This does not limit a cgroup's CPU
+                  usage if the CPUs are not busy.
+                  <h5>cpuacct</h5>
+                  This provides accounting for CPU usage by groups of tasks.
+                  <h5>cpuset</h5>
+                  This cgroup can be used to bind the tasks in a cgroup to a specified set of CPUs and NUMA nodes.
+                  <h5>memory</h5>
+                  The memory controller supports reporting and limiting of
+                  process memory, kernel memory, and swap used by cgroups.
+                  <h5>devices</h5>
+                  This supports controlling which tasks may create (mknod)
+                  devices as well as open them for reading or writing.  The
+                  policies may be specified as whitelists and blacklists.
+                  Hierarchy is enforced, so new rules must not violate existing
+                  rules for the target or ancestor cgroups.
+                  <h5>freezer</h5>
+                  The freezer cgroup can suspend and restore (resume) all tasks
+                  in a cgroup.  Freezing a cgroup /A also causes its children,
+                  for example, tasks in /A/B, to be frozen.
+                  <h5>net_cls</h5>
+                  This places a classid, specified for the cgroup, on network
+                  packets created by a cgroup.  These classids can then be used
+                  in firewall rules, as well as used to shape traffic using
+                  tc(8).  This applies only to packets leaving the cgroup, not
+                  to traffic arriving at the cgroup.
+                  <h5>blkio</h5>
+                  The blkio cgroup controls and limits access to specified block
+                  devices by applying IO control in the form of throttling and
+                  upper limits against leaf nodes and intermediate nodes in the
+                  storage hierarchy.
+                  <h5>perf_event</h5>
+                  This controller allows perf monitoring of the set of processes
+                  grouped in a cgroup.
+                  <h5>net_prio</h5>
+                  This allows priorities to be specified, per network interface,
+                  for cgroups.
+                  <h5>hugetlb</h5>
+                  This supports limiting the use of huge pages by cgroups.
+                  <h5>pids</h5>
+                  This controller permits limiting the number of process that
+                  may be created in a cgroup (and its descendants).
+                </aside>
             </script>
           </section>
 
