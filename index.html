@@ -389,6 +389,12 @@
             </script>
           </section>
 
+          <section data-markdown>
+            <script type="text/template">
+              [![Top](images/top.png)](images/top.png)
+            </script>
+          </section>
+
           <section>
             <h3>LXC vs Docker</h3>
             <img src="images/lxc-vs-docker.png" />
@@ -494,10 +500,10 @@
 
               - [Zombie reaping issue](https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/)
               - Multiple containers to run simple application
-              - Rails
-              - Database
-              - Resque
-              - etc.
+                - Rails
+                - Database
+                - Resque
+                - etc.
               - See [`baseimage-docker`](https://github.com/phusion/baseimage-docker)
             </script>
           </section>
@@ -668,7 +674,6 @@
                 -v example_pg:/var/lib/postgresql/data \
                 postgres:9.5
 
-
               # Rails Container
               docker run --name example_rails -d \
                 --network ror_example \
@@ -686,6 +691,7 @@
               - Orchestrates multiple containers and their parameters in a single `.yml` file
               - Allows declaration of container dependencies
               - [Soon](https://github.com/docker/compose/issues/3754) — Container [healthcheck](https://docs.docker.com/engine/reference/builder/#/healthcheck)
+              - `docker-compose up`
             </script>
           </section>
 
@@ -715,6 +721,101 @@
               volumes:
                 pg_data: {}
               ```
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ### nginx Reverse Proxy with Let's Encrypt TLS Certificate [[1]](https://github.com/lawliet89/docker-nginx-tutorial)
+
+              Diagram here
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ### `docker-compose.yml`
+
+              ```yml
+              version: "2"
+              services:
+                nginx:
+                  image: nginx
+                  container_name: nginx
+                  ports:
+                    - 80:80
+                    - 443:443
+                  volumes:
+                    - nginx_conf:/etc/nginx/conf.d
+                    - nginx_vhost:/etc/nginx/vhost.d
+                    - nginx_html:/usr/share/nginx/html
+                    - nginx_certs:/etc/nginx/certs:ro
+                  networks:
+                    - nginx
+                nginx_gen:
+                   image: jwilder/docker-gen
+                   container_name: nginx_gen
+                   volumes_from:
+                    - nginx
+                   volumes:
+                     - ./nginx-proxy/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
+                     - /var/run/docker.sock:/tmp/docker.sock:ro
+                   command: ["-notify-sighup", "nginx", "-watch", "-wait",
+                             "5s:30s", "/etc/docker-gen/templates/nginx.tmpl",
+                             "/etc/nginx/conf.d/default.conf"]
+                   networks:
+                     - nginx
+                letsencrypt:
+                  image: jrcs/letsencrypt-nginx-proxy-companion
+                  environment:
+                    NGINX_DOCKER_GEN_CONTAINER: nginx_gen
+                  volumes_from:
+                    - nginx
+                  volumes:
+                    - nginx_certs:/etc/nginx/certs:rw
+                    - /var/run/docker.sock:/var/run/docker.sock:ro
+                  depends_on:
+                    - nginx_gen
+                  networks:
+                    - nginx
+              volumes:
+                nginx_conf: {}
+                nginx_vhost: {}
+                nginx_html: {}
+                nginx_certs: {}
+              networks:
+                nginx:
+                  external: true
+              ```
+            </script>
+          </section>
+        </section>
+        <section>
+          <section data-markdown>
+            <script type="text/template">
+              ## Simplier Containers?
+
+              - LXD (_lex_dee_)
+              - [Bocker](https://github.com/p8952/bocker)
+                <br />Docker in around 100 lines of bash
+              - [... and others](https://www.flockport.com/sleepwalking-into-a-monoculture-lock-in-with-linux-containers/)
+            </script>
+          </section>
+        </section>
+
+        <section>
+          <section data-markdown>
+            <script type="text/template">
+              ## Thank you!
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ![GovBuy](images/govbuy_lightblur.svg)
+
+              - [bit.ly/govBuy](http://bit.ly/govBuy)
+              - [bit.ly/what_is_govbuy](http://bit.ly/simi_gbuy)
             </script>
           </section>
         </section>
