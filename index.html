@@ -131,6 +131,9 @@
                    dir_fd = open(".", O_RDONLY);
                    chroot(".42"); // chroot to temp directory
                    fchdir(dir_fd); // cd to previous fake root
+
+                   // At this point we have escaped the jail
+
                    close(dir_fd);
                    for(x = 0; x < 1000; x++) chdir(".."); // go up up up
                    chroot(".");
@@ -147,74 +150,11 @@
              </script>
            </section>
 
-           <section data-markdown>
-             <script type="text/template">
-               ## chroot Jailbreak
-
-               ```bash
-               ~/jail$ ls -al
-               total 1812
-               drwxrwxr-x  6 yongwen yongwen   4096 Sep 13 12:34 .
-               drwxr-xr-x 96 yongwen yongwen   4096 Sep 13 12:34 ..
-               drwxr-xr-x  2 root    root      4096 Sep 13 12:33 .42
-               drwxrwxr-x  2 yongwen yongwen   4096 Sep 13 10:47 bin
-               drwxrwxr-x  3 yongwen yongwen   4096 Sep 13 10:48 lib
-               drwxrwxr-x  2 yongwen yongwen   4096 Sep 13 10:49 lib64
-               -rwxrwxr-x  1 yongwen yongwen 909168 Sep 13 12:32 unchroot
-               -rwxrwxr-x  1 yongwen yongwen 909376 Sep 13 12:34 unchroot2
-               -rw-rw-r--  1 yongwen yongwen    332 Sep 13 12:34 unchroot2.c
-               -rw-rw-r--  1 yongwen yongwen    205 Sep 13 12:32 unchroot.c
-               ~/jail$ sudo chroot .
-               bash-4.3# ls -al
-               total 1812
-               drwxrwxr-x 6 1000 1000   4096 Sep 13 04:34 .
-               drwxrwxr-x 6 1000 1000   4096 Sep 13 04:34 ..
-               drwxr-xr-x 2    0    0   4096 Sep 13 04:33 .42
-               drwxrwxr-x 2 1000 1000   4096 Sep 13 02:47 bin
-               drwxrwxr-x 3 1000 1000   4096 Sep 13 02:48 lib
-               drwxrwxr-x 2 1000 1000   4096 Sep 13 02:49 lib64
-               -rwxrwxr-x 1 1000 1000 909168 Sep 13 04:32 unchroot
-               -rw-rw-r-- 1 1000 1000    205 Sep 13 04:32 unchroot.c
-               -rwxrwxr-x 1 1000 1000 909376 Sep 13 04:34 unchroot2
-               -rw-rw-r-- 1 1000 1000    332 Sep 13 04:34 unchroot2.c
-               bash-4.3# ./unchroot2
-               -i: 26: [[: not found
-               # ls -al
-               total 295
-               drwxr-xr-x  26 root root   4096 Aug 30 09:15 .
-               drwxr-xr-x  26 root root   4096 Aug 30 09:15 ..
-               drwxr-xr-x   2 root root   4096 Aug  8 09:17 bin
-               drwxr-xr-x   5 root root   3072 Aug 30 09:15 boot
-               drwxrwxr-x   2 root root   4096 Oct 28  2015 cdrom
-               -rw-------   1 root root      0 Nov  6  2015 core
-               drwxr-xr-x  22 root root   4600 Sep  5 11:18 dev
-               drwxr-xr-x 166 root root  12288 Sep 13 10:40 etc
-               drwxr-xr-x   4 root root   4096 Jun 20 12:47 home
-               lrwxrwxrwx   1 root root     32 Aug 30 09:09 initrd.img -> boot/initrd.img-4.4.0-36-generic
-               drwxr-xr-x  25 root root   4096 Sep 13 10:40 lib
-               drwxr-xr-x   2 root root   4096 May 16 13:50 lib32
-               drwxr-xr-x   2 root root   4096 May 16 13:42 lib64
-               drwxr-xr-x   2 root root   4096 May 16 13:42 libx32
-               drwx------   2 root root  16384 Oct 28  2015 lost+found
-               drwxr-xr-x   3 root root   4096 Oct 28  2015 media
-               drwxr-xr-x   2 root root   4096 May 16 13:42 mnt
-               drwxr-xr-x   8 root root   4096 May 31 16:04 opt
-               dr-xr-xr-x 350 root root      0 Sep  5 11:18 proc
-               drwx------  13 root root   4096 Jul 11 11:37 root
-               drwxr-xr-x  37 root root   1180 Sep 13 10:40 run
-               drwxr-xr-x   2 root root  12288 Sep 13 10:40 sbin
-               drwxr-xr-x   2 root root   4096 May 10 05:32 snap
-               drwxr-xr-x   2 root root   4096 Oct 21  2015 srv
-               dr-xr-xr-x  13 root root      0 Sep 13 12:35 sys
-               drwxrwxrwt  20 root root 184320 Sep 13 12:55 tmp
-               drwxr-xr-x  13 root root   4096 Dec 10  2015 usr
-               drwxr-xr-x  15 root root   4096 May 16 13:51 var
-               lrwxrwxrwx   1 root root     29 Aug 30 09:09 vmlinuz -> boot/vmlinuz-4.4.0-36-generic
-               ```
-             </script>
+           <section>
+               <h3>chroot Jailbreak</h3>
+               <script type="text/javascript" src="https://asciinema.org/a/bhymh1u9hgk62impxcm2onvrg.js" id="asciicast-bhymh1u9hgk62impxcm2onvrg" async></script>
            </section>
-        </section>
-
+         </section>
        <section data-markdown>
          <script type="text/template">
            ## LXC [[1]](http://www.stgraber.org/2013/12/20/lxc-1-0-blog-post-series/)
@@ -245,7 +185,7 @@
                ## Namespace [[1]](http://www.haifux.org/lectures/299/netLec7.pdf) [[2]](https://media.wix.com/ugd/295986_d5059f95a78e451db5de3d54f711e45d.pdf) [[3]](https://lwn.net/Articles/531114/)
 
                - Lightweight process virtualisation
-               - Seven Namespaces:
+               - Seven Namespace Types:
                 - uts (hostname)
                 - ipc (Interprocess communication)
                 - pid (processes)
@@ -267,7 +207,7 @@
              <script type="text/template">
                ## Namespace
                ```bash
-               $ ls -al "/proc/$$/ns"
+               $ ls -al /proc/self/ns
                total 0
                dr-x--x--x 2 yongwen yongwen 0 Sep 13 13:28 .
                dr-xr-xr-x 9 yongwen yongwen 0 Sep 13 10:46 ..
@@ -280,6 +220,22 @@
                lrwxrwxrwx 1 yongwen yongwen 0 Sep 13 13:28 uts -> uts:[4026531838]
                ```
              </script>
+           </section>
+
+           <section>
+             <h3>PID Namespace <a href="https://github.com/nbrownuk/Namespaces/">[SRC]</a></h3>
+             <script type="text/javascript" src="https://asciinema.org/a/cxhwiv7gofn84vd6fj4ltmchl.js" id="asciicast-cxhwiv7gofn84vd6fj4ltmchl" async></script>
+           </section>
+
+           <section>
+             <h3>PID and MNT Namespace</h3>
+             <script type="text/javascript" src="https://asciinema.org/a/cxhwiv7gofn84vd6fj4ltmchl.js" id="asciicast-cxhwiv7gofn84vd6fj4ltmchl" async></script>
+           </section>
+         </section>
+
+         <section>
+           <section>
+             <h2> Namespace Types</h2>
            </section>
 
            <section data-markdown>
@@ -513,7 +469,7 @@ tasks
           <section>
             <h3>cgroups and subsystems for a process</h3>
             <pre>
-$ cat "/proc/$$/cgroup"
+$ cat /proc/self/cgroup
 11:blkio:/user.slice
 10:pids:/user.slice/user-1000.slice
 9:memory:/user.slice
@@ -541,8 +497,8 @@ $ cat "/proc/$$/cgroup"
             <script type="text/template">
                 ### Subsystems
 
-                - `4.4.0-36`: cpuset, cpu, cpuacct, blkio, memory, devices,
-                freezer, net_cls, perf_event, net_prio, hugetlb, pids [[1]](http://man7.org/linux/man-pages/man7/cgroups.7.html)
+                - In `4.4.0-36`: `cpuset, cpu, cpuacct, blkio, memory, devices,
+                freezer, net_cls, perf_event, net_prio, hugetlb, pids` [[1]](http://man7.org/linux/man-pages/man7/cgroups.7.html)
                 - Some subsystems simply identify processes or collect information (e.g. cpuacct)
                 - Some subsystems impose control (e.g. cpuset, cpu, memory)
                 - Subsystems can choose to push data down the hierarchy (e.g. freezer)
@@ -627,11 +583,11 @@ $ cat "/proc/$$/cgroup"
             </script>
           </section>
 
-          <section data-markdown>
+          <!-- <section data-markdown>
             <script type="text/template">
               [![Top](images/top.png)](images/top.png)
             </script>
-          </section>
+          </section> -->
 
           <section>
             <h3>LXC vs Docker</h3>
@@ -1025,6 +981,18 @@ $ cat "/proc/$$/cgroup"
                   external: true
               ```
             </script>
+          </section>
+
+          <section>
+            <script type="text/javascript" src="https://asciinema.org/a/85808.js" id="asciicast-85808" async></script>
+          </section>
+
+          <section>
+            <script type="text/javascript" src="https://asciinema.org/a/85810.js" id="asciicast-85810" async></script>
+          </section>
+
+          <section>
+            <script type="text/javascript" src="https://asciinema.org/a/85811.js" id="asciicast-85811" async></script>
           </section>
         </section>
         <section>
