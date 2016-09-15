@@ -34,6 +34,9 @@
         max-height: none !important;
       }
     </style>
+
+    <link rel="stylesheet" type="text/css" href="asciinema-player.css" />
+    <script src="asciinema-player.js"></script>
 	</head>
 	<body>
 		<div class="reveal">
@@ -165,8 +168,11 @@
            </section>
 
            <section>
-               <h3>chroot Jailbreak <a href="https://asciinema.org/a/bhymh1u9hgk62impxcm2onvrg">[1]</a> </h3>
-               <script type="text/javascript" src="https://asciinema.org/a/bhymh1u9hgk62impxcm2onvrg.js" id="asciicast-bhymh1u9hgk62impxcm2onvrg" data-preload="1" async></script>
+               <h3>chroot Jailbreak</h3>
+               <div id="chroot-player-container"></div>
+               <script>
+                asciinema.player.js.CreatePlayer('chroot-player-container', 'asciinema/chroot.json', { preload: true });
+               </script>
            </section>
          </section>
        <section data-markdown>
@@ -237,13 +243,19 @@
            </section>
 
            <section>
-             <h3>PID Namespace <a href="https://github.com/nbrownuk/Namespaces/">[SRC] <a href="https://asciinema.org/a/85812">[1]</a></h3>
-             <script type="text/javascript" src="https://asciinema.org/a/cxhwiv7gofn84vd6fj4ltmchl.js" id="asciicast-cxhwiv7gofn84vd6fj4ltmchl" data-preload="1" async></script>
+             <h3>PID Namespace</h3>
+             <div id="pid-player-container"></div>
+             <script>
+              asciinema.player.js.CreatePlayer('pid-player-container', 'asciinema/pid_ns.json', { preload: true });
+             </script>
            </section>
 
            <section>
-             <h3>PID and MNT Namespace <a href="https://asciinema.org/a/cxhwiv7gofn84vd6fj4ltmchl">[1]</a></h3>
-             <script type="text/javascript" src="https://asciinema.org/a/cxhwiv7gofn84vd6fj4ltmchl.js" id="asciicast-cxhwiv7gofn84vd6fj4ltmchl" data-preload="1" async></script>
+             <h3>PID and MNT Namespace</h3>
+             <div id="mnt-player-container"></div>
+             <script>
+              asciinema.player.js.CreatePlayer('mnt-player-container', 'asciinema/pid_mnt_ns.json', { preload: true });
+             </script>
            </section>
          </section>
 
